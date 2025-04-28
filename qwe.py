@@ -4,8 +4,7 @@ import numpy as np
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 
-# 1. Load the pre-trained model (ensure that the model is saved as 'plant_disease_model.h5')
-model = load_model('plant_disease_model.h5')
+
 
 # 2. Set Parameters
 img_size = (224, 224)
