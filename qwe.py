@@ -2,9 +2,28 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import load_model
 
+# 1. Model Definition (You define the model architecture here)
+def create_model():
+    img_size = (224, 224)
+    
+    # Define the model architecture (same as the trained one)
+    base_model = tf.keras.applications.MobileNetV2(input_shape=img_size + (3,), include_top=False, weights='imagenet')
+    base_model.trainable = False
+    
+    model = tf.keras.Sequential([
+        base_model,
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(3, activation='softmax')  # Update '3' with the number of your classes
+    ])
+    
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
 
+# Initialize and train the model (only when needed; normally this can be pre-trained)
+model = create_model()
 
 # 2. Set Parameters
 img_size = (224, 224)
@@ -25,17 +44,17 @@ if uploaded_file is not None:
     # Show the uploaded image
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
 
-    # 5. Prediction function
+    # 5. Prediction function (Inference)
     def predict_image(img_array):
         predictions = model.predict(img_array)
         predicted_class = np.argmax(predictions[0])  # Get index of the max probability
         return predicted_class, predictions
 
-    # 6. Get prediction
+    # 6. Get Prediction
     predicted_class, predictions = predict_image(img_array)
 
     # 7. Class Names (update with your actual class names from dataset)
-    class_names = ['class1', 'class2', 'class3']  # Replace with your actual class names
+    class_names = ['Healthy', 'Bacterial Blight', 'Powdery Mildew']  # Replace with actual class names
 
     # Display prediction results
     st.write(f"Predicted Class: {class_names[predicted_class]}")
